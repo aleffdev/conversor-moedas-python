@@ -1,6 +1,4 @@
-# conversor-moedas-python
-
-Conversor de Moedas — Python + Flask
+# Conversor de Moedas — Python + Flask
 
 Este é um conversor de moedas que utiliza Python, Flask e uma API pública (Frankfurter API) para converter valores entre diferentes moedas em tempo real.  
 A interface é feita com HTML, CSS e JavaScript, e o back-end processa as requisições e retorna o valor convertido.
