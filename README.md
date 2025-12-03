@@ -58,4 +58,5 @@ Este projeto é apenas para fins educacionais e pode ser utilizado livremente.
 
 
 # Abaixo, um print do app rodando no navegador:
-(images/flask_app.png)
+![Print do app Flask](images/flask_app.png)
+
