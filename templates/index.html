@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Conversor de Moedas — Aleff</title>
+
+  <!-- Scripts do Vanta.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+
+  <style>
+    :root{
+      --card-bg: rgba(255,255,255,0.12);
+      --accent: #00e6a8;
+      --glass: rgba(255,255,255,0.08);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body,html{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      font-family: "Inter", Arial, sans-serif;
+      color:#fff;
+    }
+
+    /* Fundo animado */
+    #background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* Conteúdo */
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 16px;
+    }
+
+    .card{
+      width:360px;
+      padding:22px;
+      border-radius:14px;
+      background:var(--card-bg);
+      box-shadow:0 8px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
+      text-align:center;
+    }
+
+    h1{font-size:20px;margin-bottom:16px}
+    .row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .flag-img{
+      width:36px;height:24px;border-radius:4px;object-fit:cover;
+      flex:0 0 36px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.25);
+      background:var(--glass);
+    }
+
+    select, input[type="number"]{
+      flex:1;
+      padding:10px 12px;
+      border-radius:8px;
+      border:none;
+      font-size:15px;
+      outline:none;
+      background: rgba(0,0,0,0.12);
+      color: #fff;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+
+    button{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:none;
+      background:var(--accent);
+      color:#012;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .12s ease;
+    }
+    button:active{transform:translateY(1px)}
+    .result{
+      margin-top:14px;
+      text-align:center;
+      font-weight:600;
+      color:#fff;
+    }
+
+    .small{
+      font-size:13px;
+      opacity:0.9;
+      margin-top:6px;
+      text-align:center;
+      color:#e8fdf5;
+    }
+
+    @media (max-width:420px){
+      .card{width:92vw;padding:16px}
+      .flag-img{width:30px;height:20px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fundo animado -->
+  <div id="background"></div>
+
+  <!-- Conteúdo principal -->
+  <div class="container">
+    <div class="card">
+      <h1>💱 Conversor</h1>
+
+      <div class="row">
+        <img id="flag-from" class="flag-img" src="https://flagcdn.com/w80/br.png" alt="Bandeira origem">
+        <select id="from">
+          <option value="BRL" data-flag="https://flagcdn.com/w80/br.png">BRL — Real (Brasil)</option>
+          <option value="USD" data-flag="https://flagcdn.com/w80/us.png">USD — Dólar (EUA)</option>
+          <option value="CAD" data-flag="https://flagcdn.com/w80/ca.png">CAD — Dólar (Canadá)</option>
+          <option value="EUR" data-flag="https://flagcdn.com/w80/eu.png">EUR — Euro (Europa)</option>
+          <option value="GBP" data-flag="https://flagcdn.com/w80/gb.png">GBP — Libra (Reino Unido)</option>
+          <option value="JPY" data-flag="https://flagcdn.com/w80/jp.png">JPY — Iene (Japão)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <img id="flag-to" class="flag-img" src="https://flagcdn.com/w80/us.png" alt="Bandeira destino">
+        <select id="to">
+          <option value="USD" data-flag="https://flagcdn.com/w80/us.png">USD — Dólar (EUA)</option>
+          <option value="BRL" data-flag="https://flagcdn.com/w80/br.png">BRL — Real (Brasil)</option>
+          <option value="CAD" data-flag="https://flagcdn.com/w80/ca.png">CAD — Dólar (Canadá)</option>
+          <option value="EUR" data-flag="https://flagcdn.com/w80/eu.png">EUR — Euro (Europa)</option>
+          <option value="GBP" data-flag="https://flagcdn.com/w80/gb.png">GBP — Libra (Reino Unido)</option>
+          <option value="JPY" data-flag="https://flagcdn.com/w80/jp.png">JPY — Iene (Japão)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <input id="amount" type="number" placeholder="Valor (ex: 100)" step="0.01" />
+      </div>
+
+      <button id="convertBtn">Converter</button>
+
+      <div class="result" id="result">—</div>
+      <div class="small" id="rateText"></div>
+    </div>
+  </div>
+
+  <script>
+    // Ativa o fundo animado VANTA.NET
+    VANTA.NET({
+      el: "#background",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00e6a8,
+      backgroundColor: 0x0a0a0a,
+      points: 10.00,
+      maxDistance: 20.00,
+      spacing: 16.00
+    });
+
+    // Lógica de conversão
+    const selFrom = document.getElementById('from');
+    const selTo = document.getElementById('to');
+    const flagFrom = document.getElementById('flag-from');
+    const flagTo = document.getElementById('flag-to');
+    const amount = document.getElementById('amount');
+    const btn = document.getElementById('convertBtn');
+    const resultDiv = document.getElementById('result');
+    const rateText = document.getElementById('rateText');
+
+    function syncFlags(){
+      flagFrom.src = selFrom.selectedOptions[0].dataset.flag;
+      flagTo.src = selTo.selectedOptions[0].dataset.flag;
+    }
+    syncFlags();
+
+    selFrom.addEventListener('change', () => flagFrom.src = selFrom.selectedOptions[0].dataset.flag);
+    selTo.addEventListener('change', () => flagTo.src = selTo.selectedOptions[0].dataset.flag);
+
+    async function converter(){
+      resultDiv.textContent = 'Convertendo...';
+      rateText.textContent = '';
+      const from = selFrom.value;
+      const to = selTo.value;
+      const val = parseFloat(amount.value);
+
+      if (!val || val <= 0) {
+        resultDiv.textContent = 'Digite um valor válido (> 0).';
+        return;
+      }
+
+      try {
+        const res = await fetch('/converter', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ moeda_origem: from, moeda_destino: to, valor: val })
+        });
+        const data = await res.json();
+        if (res.ok && data.resultado !== undefined) {
+          resultDiv.textContent = `${val.toFixed(2)} ${from} = ${Number(data.resultado).toFixed(2)} ${to}`;
+          if (data.rate) rateText.textContent = `Taxa: 1 ${from} = ${Number(data.rate).toFixed(6)} ${to}`;
+        } else {
+          resultDiv.textContent = data.erro || 'Conversão indisponível.';
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        resultDiv.textContent = 'Erro na conexão. Tente novamente.';
+      }
+    }
+
+    btn.addEventListener('click', converter);
+  </script>
+</body>
+</html>
